@@ -19,7 +19,7 @@ Follow and maintain [`.cursor/project_specific_assets/release_workflow.md`](../p
 1. **Bootstrap Git** — Expand `.gitignore`; build Phase 0 commit history on `develop`; run root typecheck/build; tag `v0.1.0-mock`; keep `master` submission-ready (aligned with mock milestone until full release).
 2. **Worktrees** — After Phase 0, add `../travelfactory-fe`, `../travelfactory-be`, and `../travelfactory-int` with the branches named in the workflow doc so other personas do not share one working tree.
 3. **Merge gates** — Merge backend then integration into `develop` only when each plan’s verification checklist passes; never advance `master` with incomplete backend.
-4. **Release cut** — Branch `release/v1.0.0` from `develop`; run full-stack E2E and README verification; allow only release/doc/fix commits on that branch; merge to `master` and tag `v1.0.0`.
+4. **Release cut** — Branch `release/v1.0.0` from `develop`; obtain **QA Engineer** E2E sign-off (or a written fail list routed to owners) per `.cursor/personas/qa-engineer.md`; verify README; allow only release/doc/fix commits on that branch; merge to `master` and tag `v1.0.0`.
 5. **Remote** — Add `origin`, push `master`, `develop`, and tags (private GitHub or Bitbucket); use network helper before push when on corporate proxy.
 6. **Runbook hygiene** — When branch or gate rules change, update `release_workflow.md` in the same change set as the process change.
 

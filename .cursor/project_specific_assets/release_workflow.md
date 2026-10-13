@@ -82,7 +82,7 @@ Run gates:
 | Frontend | `npm run typecheck`, `npm run build` |
 | Backend | In `backend/`: typecheck, test, build |
 | Database | `db:up`, migrate, seed |
-| E2E | Backend dev + frontend with `VITE_USE_MOCK_API=false` |
+| E2E | **QA Engineer** (or assignee): full manual matrix in `.cursor/personas/qa-engineer.md`; real API + PostgreSQL |
 | Docs | Re-run every command documented in `README.md` |
 | Secrets | No `.env` in Git; only `.env.example` |
 

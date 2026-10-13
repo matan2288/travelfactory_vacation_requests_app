@@ -4,16 +4,16 @@ overview: Implement a small TypeScript backend in `backend/` using the assignmen
 todos:
   - id: scaffold-backend
     content: Set up the strict TypeScript backend, CEF routing/entry point, environment config, and PostgreSQL service.
-    status: pending
+    status: completed
   - id: build-persistence
     content: Create TypeORM entities, migrations, constraints, repositories, and demo seed matching the frontend accounts.
-    status: pending
+    status: completed
   - id: implement-api
     content: Implement authentication, RBAC, vacation command/query handlers, domain events, and team planning.
-    status: pending
+    status: completed
   - id: verify-document
     content: Add focused tests, run all backend checks, and document setup, architecture, credentials, and limitations.
-    status: pending
+    status: completed
 isProject: false
 ---
 

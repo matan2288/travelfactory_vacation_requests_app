@@ -19,3 +19,4 @@ Do not implement from these skills. Delegate to the persona that already owns th
 - Frontend Engineer: `.agents/skills/vue2/SKILL.md`, `.agents/skills/tailwind-design-system/SKILL.md`
 - Backend/Middleware Engineer: `.agents/skills/nodejs-backend-patterns/SKILL.md`, `.agents/skills/typeorm/SKILL.md`, `.agents/skills/supabase-postgres-best-practices/SKILL.md`
 - Release Engineer: no `.agents` skill. Owns local setup instructions, the approach write-up, and the GitHub or Bitbucket repository. The five skills above stay with Frontend and Backend.
+- QA Engineer: no `.agents` skill. Owns functional E2E validation against `task_requirements.md`, business rules, integration verification, and release workflow gates. Sends defects to the owning implementer or Release Engineer for setup/docs.
