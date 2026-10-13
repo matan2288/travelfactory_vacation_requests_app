@@ -51,9 +51,9 @@ flowchart TD
   E -->|no| F[Allow]
   E -->|yes, no token| G["/login?redirect=…"]
   E -->|yes| H{requiredRole VALIDATOR?}
-  H -->|wrong role| I[/my-requests]
+  H -->|wrong role| I["/my-requests"]
   H -->|ok| F
-  D --> J[/approvals or /my-requests]
+  D --> J["/approvals or /my-requests"]
 ```
 
 ## Routes & features
