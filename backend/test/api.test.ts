@@ -130,9 +130,10 @@ describe('vacation request lifecycle', () => {
   });
 
   it('approves a pending request once, then locks it', async () => {
-    const approved = await call({ method: 'PATCH', path: `/vacation-requests/${approvedId}/approve`, token: tokens.validator });
+    const approved = await call({ method: 'PATCH', path: `/vacation-requests/${approvedId}/approve`, token: tokens.validator, body: { comment: '  Enjoy  ' } });
     assert.equal(approved.status, 200);
     assert.equal(approved.body.status, 'APPROVED');
+    assert.equal(approved.body.comments, 'Enjoy');
     assert.notEqual(approved.body.updatedAt, approved.body.createdAt);
     const event = published.find((e) => e.name === 'VacationRequestApproved') as DomainEvent & { validatorId: string };
     assert.equal(event.validatorId, ids.validator);

@@ -22,6 +22,7 @@ export class ApproveVacationRequestCommand {
   constructor(
     readonly requestId: string,
     readonly validatorId: string,
+    readonly comment: string | null = null,
   ) {}
 }
 
@@ -63,7 +64,7 @@ export async function handleCreateVacationRequest(
 }
 
 export async function handleApproveVacationRequest(command: ApproveVacationRequestCommand): Promise<VacationRequestDto> {
-  await decideOrFail(command.requestId, 'APPROVED', null);
+  await decideOrFail(command.requestId, 'APPROVED', command.comment);
   const approved = await loadOrFail(command.requestId);
   await eventDispatcher.publish(
     new VacationRequestApprovedEvent(approved.id, approved.requesterId, command.validatorId),

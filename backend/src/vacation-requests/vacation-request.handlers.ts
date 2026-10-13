@@ -11,6 +11,7 @@ import {
 import type { VacationRequestDto } from './vacation-request.mapper';
 import { getMyVacationRequests, getVacationRequests, type PaginatedResponse } from './vacation-request.queries';
 import {
+  approveVacationRequestSchema,
   createVacationRequestSchema,
   listVacationRequestsSchema,
   rejectVacationRequestSchema,
@@ -38,10 +39,13 @@ export const parseList = guarded(['VALIDATOR'], (event) => ({
 export const list: HandlerFn<ReturnType<typeof parseList>, PaginatedResponse<VacationRequestDto>> = ({ query }) =>
   getVacationRequests(query);
 
-export const parseApprove = guarded(['VALIDATOR'], (event) => parseWith(requestIdSchema, event.pathParameters));
+export const parseApprove = guarded(['VALIDATOR'], (event) => ({
+  ...parseWith(requestIdSchema, event.pathParameters),
+  ...parseWith(approveVacationRequestSchema, readJsonBody(event)),
+}));
 
-export const approve: HandlerFn<ReturnType<typeof parseApprove>, VacationRequestDto> = ({ auth, id }) =>
-  handleApproveVacationRequest(new ApproveVacationRequestCommand(id, auth.userId));
+export const approve: HandlerFn<ReturnType<typeof parseApprove>, VacationRequestDto> = ({ auth, id, comment }) =>
+  handleApproveVacationRequest(new ApproveVacationRequestCommand(id, auth.userId, comment));
 
 export const parseReject = guarded(['VALIDATOR'], (event) => ({
   ...parseWith(requestIdSchema, event.pathParameters),

@@ -38,7 +38,7 @@ export const vacationRequestRepository = {
     const result = await repo()
       .createQueryBuilder()
       .update()
-      .set(status === 'REJECTED' ? { status, comments } : { status })
+      .set({ status, comments })
       .where('id = :id AND status = :pending', { id, pending: 'PENDING' })
       .execute();
     return result.affected === 1;

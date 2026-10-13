@@ -99,11 +99,19 @@ paths:
 
   /vacation-requests/:id/approve:
     patch:
-      summary: Approve a pending request (validator only)
+      summary: Approve a pending request with an optional comment (validator only)
       x-handler: vacation-requests/vacation-request.handlers#approve
       x-inputParser: vacation-requests/vacation-request.handlers#parseApprove
       parameters:
         - { in: path, name: id, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment: { type: string, maxLength: 1000 }
       responses:
         '200': { description: Approved VacationRequest }
         '404': { description: Not found }

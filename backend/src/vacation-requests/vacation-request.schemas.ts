@@ -28,6 +28,15 @@ export const rejectVacationRequestSchema = z.object({
   comment: z.string().trim().min(1, 'A rejection comment is required.').max(1000, 'Comment must be at most 1000 characters.'),
 });
 
+export const approveVacationRequestSchema = z.object({
+  comment: z
+    .string()
+    .trim()
+    .max(1000, 'Comment must be at most 1000 characters.')
+    .nullish()
+    .transform((value) => value || null),
+});
+
 export const requestIdSchema = z.object({ id: z.uuid('Invalid request id.') });
 
 export const listVacationRequestsSchema = z.object({
