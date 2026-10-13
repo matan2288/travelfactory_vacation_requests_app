@@ -1,0 +1,6 @@
+{
+  "name": "Vacation Management System",
+  "description": "Production-grade vacation request, approval, and team planning monorepo application built with Vue 2.7, TypeScript, and Tailwind CSS.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
