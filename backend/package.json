@@ -1,0 +1,39 @@
+{
+  "name": "vacation-management-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Vacation management API on Common Event Framework, TypeORM and PostgreSQL",
+  "main": "dist/index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "codegen": "node node_modules/commoneventframework/dist/script/generateHandlerRegistry.js",
+    "dev": "npm run codegen && ts-node src/index.ts --local 8888",
+    "build": "cef-build",
+    "typecheck": "npm run codegen && tsc --noEmit",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:migrate": "ts-node src/database/migrate.ts",
+    "db:revert": "ts-node src/database/migrate.ts --revert",
+    "db:seed": "ts-node src/database/seed.ts",
+    "test": "npm run codegen && node --require ts-node/register/transpile-only --test --test-concurrency=1 test/*.test.ts"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "commoneventframework": "^1.0.19",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.23.1",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^1.1.2",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.164",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^26.6.5",
+    "@types/pg": "^8.23.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
