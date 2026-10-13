@@ -1,0 +1,143 @@
+openapi: 3.0.3
+info:
+  title: Vacation Management API
+  version: 1.0.0
+  description: >
+    Requesters submit vacation requests; validators approve or reject them.
+    All routes except POST /auth/login require `Authorization: Bearer <token>`.
+    Errors use the shape { code, message, details? }.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
+paths:
+  /auth/login:
+    post:
+      summary: Exchange email and password for a JWT session
+      security: []
+      x-handler: auth/auth.handlers#login
+      x-inputParser: auth/auth.handlers#parseLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+      responses:
+        '200': { description: '{ user, token, expiresAt }' }
+        '400': { description: Validation error }
+        '401': { description: Invalid email or password }
+
+  /auth/me:
+    get:
+      summary: Current authenticated user
+      x-handler: auth/auth.handlers#me
+      x-inputParser: auth/auth.handlers#parseMe
+      responses:
+        '200': { description: 'User' }
+        '401': { description: 'Missing, invalid or expired token' }
+
+  /users:
+    get:
+      summary: List users (validator only), used by the requester filter
+      x-handler: users/users.handlers#listUsers
+      x-inputParser: users/users.handlers#parseListUsers
+      parameters:
+        - { in: query, name: role, schema: { type: string, enum: [REQUESTER, VALIDATOR] } }
+      responses:
+        '200': { description: 'User[]' }
+        '403': { description: Not a validator }
+
+  /vacation-requests:
+    post:
+      summary: Submit a vacation request (requester only)
+      x-handler: vacation-requests/vacation-request.handlers#create
+      x-inputParser: vacation-requests/vacation-request.handlers#parseCreate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [startDate, endDate]
+              properties:
+                startDate: { type: string, format: date }
+                endDate: { type: string, format: date }
+                reason: { type: string, maxLength: 500 }
+      responses:
+        '201': { description: Created VacationRequest (PENDING) }
+        '400': { description: 'Invalid dates (past start, end not after start)' }
+        '409': { description: Overlaps an existing pending or approved request }
+    get:
+      summary: All requests with filters and pagination (validator only)
+      x-handler: vacation-requests/vacation-request.handlers#list
+      x-inputParser: vacation-requests/vacation-request.handlers#parseList
+      parameters:
+        - { in: query, name: status, schema: { type: string, enum: [ALL, PENDING, APPROVED, REJECTED] } }
+        - { in: query, name: userId, schema: { type: string, format: uuid } }
+        - { in: query, name: search, schema: { type: string } }
+        - { in: query, name: page, schema: { type: integer, minimum: 1, default: 1 } }
+        - { in: query, name: pageSize, schema: { type: integer, minimum: 1, maximum: 100, default: 10 } }
+      responses:
+        '200': { description: '{ items, total, page, pageSize, totalPages }' }
+
+  /vacation-requests/me:
+    get:
+      summary: The current requester's own requests, newest first
+      x-handler: vacation-requests/vacation-request.handlers#listMine
+      x-inputParser: vacation-requests/vacation-request.handlers#parseListMine
+      responses:
+        '200': { description: 'VacationRequest[]' }
+
+  /vacation-requests/:id/approve:
+    patch:
+      summary: Approve a pending request (validator only)
+      x-handler: vacation-requests/vacation-request.handlers#approve
+      x-inputParser: vacation-requests/vacation-request.handlers#parseApprove
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string, format: uuid } }
+      responses:
+        '200': { description: Approved VacationRequest }
+        '404': { description: Not found }
+        '409': { description: Request is not pending }
+
+  /vacation-requests/:id/reject:
+    patch:
+      summary: Reject a pending request with a mandatory comment (validator only)
+      x-handler: vacation-requests/vacation-request.handlers#reject
+      x-inputParser: vacation-requests/vacation-request.handlers#parseReject
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [comment]
+              properties:
+                comment: { type: string, minLength: 1, maxLength: 1000 }
+      responses:
+        '200': { description: Rejected VacationRequest }
+        '400': { description: Missing comment }
+        '404': { description: Not found }
+        '409': { description: Request is not pending }
+
+  /team-planning:
+    get:
+      summary: Monthly team calendar of pending and approved requests (both roles)
+      x-handler: team-planning/team-planning.handlers#teamPlanning
+      x-inputParser: team-planning/team-planning.handlers#parseTeamPlanning
+      parameters:
+        - { in: query, name: year, required: true, schema: { type: integer } }
+        - { in: query, name: month, required: true, schema: { type: integer, minimum: 1, maximum: 12 } }
+      responses:
+        '200': { description: '{ year, month, daysInMonth, members: [{ user, requests }] }' }
