@@ -7,102 +7,120 @@ Solution for the **Web Development Recruitment Test: Vacation Management Interfa
 
 ---
 
-## 1. Monorepo Overview & Structure
+## 1. Architecture & Repository Structure
 
-An npm workspace monorepo. The frontend is served by Vite from the repo root (`index.html` + `vite.config.ts`), which proxies `/api` to the backend.
+An npm workspace monorepo. Vite serves the Vue frontend from the repo root.
+
+In local development, the browser talks only to port `3000`. Vite forwards `/api` to the backend on port `8888` and strips the `/api` prefix, because backend routes have no such prefix. That keeps requests same-origin and avoids a local CORS setup.
+
+### Frontend Architecture
+
+The frontend follows a feature-based architecture. Authentication, vacation requests, approvals, and team planning each own their views, components, services, types, and validation logic. Shared UI, routing, API access, and utilities stay outside the feature folders.
+
+```text
+frontend/
+├── src/
+│   ├── assets/                    # Fonts, styles, avatars
+│   ├── components/
+│   │   ├── common/                # Buttons, inputs, dialogs, tables
+│   │   └── layout/                # Header, sidebar, identity display
+│   ├── features/
+│   │   ├── auth/
+│   │   │   ├── views/
+│   │   │   └── auth.service.ts
+│   │   ├── vacation-requests/
+│   │   │   ├── components/
+│   │   │   ├── views/
+│   │   │   ├── vacation-requests.service.ts
+│   │   │   └── vacation-requests.validation.ts
+│   │   ├── approvals/
+│   │   │   ├── components/
+│   │   │   ├── views/
+│   │   │   └── approvals.service.ts
+│   │   └── team-planning/
+│   │       ├── views/
+│   │       └── team-planning.service.ts
+│   ├── router/                    # Routes and role guards
+│   ├── services/                  # Axios API client and contracts
+│   ├── mocks/                     # Optional browser mock API
+│   ├── types/
+│   └── utils/
+└── tests/
+```
+
+### Backend Architecture
+
+The backend follows a layered architecture: CEF routes and guards handle HTTP, handlers and commands/queries hold application logic, repositories handle persistence, and TypeORM talks to PostgreSQL. See [`backend/README.md`](backend/README.md) for API and database details.
+
+```text
+backend/
+├── src/
+│   ├── auth/                      # Login, JWT service and guards
+│   ├── vacation-requests/
+│   │   ├── vacation-request.handlers.ts
+│   │   ├── vacation-request.commands.ts
+│   │   ├── vacation-request.queries.ts
+│   │   ├── vacation-request.repository.ts
+│   │   ├── vacation-request.schemas.ts
+│   │   └── vacation-request.events.ts
+│   ├── team-planning/             # Team schedule query handler
+│   ├── users/                     # User listing and mapping
+│   ├── database/
+│   │   ├── entities/
+│   │   ├── migrations/
+│   │   ├── migrate.ts
+│   │   └── seed.ts
+│   ├── shared/                    # Dates, events, errors and HTTP
+│   ├── config/
+│   ├── root.yaml                  # OpenAPI routes and CEF handlers
+│   └── index.ts
+├── test/
+├── docker-compose.yml
+└── README.md
+```
+
+### Request Flow
+
+```text
+Vue view
+  → feature service
+  → shared Axios client
+  → Vite /api proxy
+  → CEF route and auth guard
+  → handler
+  → command or query
+  → TypeORM repository
+  → PostgreSQL
+```
+
+### Root Files
 
 ```text
 vacation-management/
 ├── frontend/
-│   ├── public/
-│   │   └── favicon.svg
-│   ├── src/
-│   │   ├── assets/
-│   │   │   ├── fonts/
-│   │   │   └── styles/
-│   │   │       ├── main.css
-│   │   │       └── tokens.css
-│   │   ├── components/
-│   │   │   ├── common/
-│   │   │   │   ├── AppButton.vue
-│   │   │   │   ├── AppInput.vue
-│   │   │   │   ├── AppLogo.vue
-│   │   │   │   ├── AppModal.vue
-│   │   │   │   ├── AppTable.vue
-│   │   │   │   └── AppPagination.vue
-│   │   │   └── layout/
-│   │   │       ├── AppHeader.vue
-│   │   │       ├── AppSidebar.vue
-│   │   │       ├── AppLayout.vue
-│   │   │       ├── RolePill.vue
-│   │   │       └── SignedInAs.vue
-│   │   ├── features/
-│   │   │   ├── auth/
-│   │   │   │   ├── views/
-│   │   │   │   │   └── LoginView.vue
-│   │   │   │   ├── auth.service.ts
-│   │   │   │   └── auth.types.ts
-│   │   │   ├── vacation-requests/
-│   │   │   │   ├── components/
-│   │   │   │   │   ├── RequestDetailsDialog.vue
-│   │   │   │   │   ├── RequestSummary.vue
-│   │   │   │   │   ├── VacationRequestForm.vue
-│   │   │   │   │   ├── VacationRequestList.vue
-│   │   │   │   │   └── VacationStatus.vue
-│   │   │   │   ├── views/
-│   │   │   │   │   └── MyRequestsView.vue
-│   │   │   │   ├── vacation-requests.service.ts
-│   │   │   │   ├── vacation-requests.types.ts
-│   │   │   │   └── vacation-requests.validation.ts
-│   │   │   ├── approvals/
-│   │   │   │   ├── components/
-│   │   │   │   │   ├── ApprovalFilters.vue
-│   │   │   │   │   └── DecisionDialog.vue
-│   │   │   │   ├── views/
-│   │   │   │   │   └── ApprovalDashboardView.vue
-│   │   │   │   └── approvals.service.ts
-│   │   │   └── team-planning/
-│   │   │       ├── views/
-│   │   │       │   └── TeamPlanningView.vue
-│   │   │       └── team-planning.service.ts
-│   │   ├── router/
-│   │   │   ├── index.ts
-│   │   │   └── guards.ts
-│   │   ├── services/
-│   │   │   ├── api-client.ts
-│   │   │   └── api.types.ts
-│   │   ├── mocks/
-│   │   │   ├── mock-api.ts
-│   │   │   └── mock-data.ts
-│   │   ├── types/
-│   │   │   ├── user.types.ts
-│   │   │   └── common.types.ts
-│   │   ├── utils/
-│   │   │   ├── date.utils.ts
-│   │   │   └── error.utils.ts
-│   │   ├── App.vue
-│   │   └── main.ts
-│   ├── tests/
-│   │   └── vacation-requests.validation.spec.ts
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── tailwind.config.js
-├── backend/                  # CEF + TypeORM + PostgreSQL API (see backend/README.md)
-│   ├── src/
-│   ├── test/
-│   ├── docker-compose.yml
-│   └── README.md
+├── backend/
+├── slide-screenshots/
 ├── index.html
-├── vite.config.ts            # frontend dev server, /api proxy to localhost:8888
-├── .env.example              # frontend env (VITE_API_BASE_URL, VITE_USE_MOCK_API)
-├── MANUAL_TESTING.md
+├── vite.config.ts
+├── .env.example
 ├── package.json
 └── README.md
 ```
 
+### Reviewer and Developer Resources
+
+Developers evaluating this repository can use:
+
+- [Project-specific assets](.cursor/project_specific_assets/) for requirements, architecture plans, integration notes, and the release workflow.
+- [Architecture plans](.cursor/project_specific_assets/Architechture_And_System_Design/) for the frontend, backend, and middleware decisions.
+- [Personas](.cursor/personas/) for role-specific guidance: frontend, backend, QA, release, and the technical demo.
+
 ---
 
 ## 2. Installation & Running Locally
+
+> [!TIP]
+> **Recommended for evaluators:** Use the [Technical Demo Guide](.cursor/personas/technical-demo-guide.md) for quick setup and an evidence-based walkthrough of the application.
 
 Prerequisites: **Node.js 20+**, **npm 9+**, and **Docker** (PostgreSQL runs in a container).
 
@@ -137,11 +155,24 @@ Other scripts:
 
 **Mock mode (no backend):** set `VITE_USE_MOCK_API=true` in a root `.env` (see [`.env.example`](.env.example)). The UI then uses an in-browser mock stored in `localStorage`, accepts any password, and shows a "Reset Demo Data" link in the footer. The default is real API mode.
 
-A step-by-step test walkthrough for both roles is in [`MANUAL_TESTING.md`](MANUAL_TESTING.md).
+A step-by-step test walkthrough for both roles is in [`MANUAL_TESTING.md`](.cursor/project_specific_assets/MANUAL_TESTING.md).
 
 ---
 
-## 3. Running Application
+## 3. Seeded Demo Accounts
+
+All accounts use the password **`demo1234`**.
+
+| Role | Name | Email |
+| :--- | :--- | :--- |
+| **REQUESTER** | Alex Morgan | `alex.requester@company.internal` |
+| **REQUESTER** | Sarah Chen | `sarah.dev@company.internal` |
+| **REQUESTER** | Marcus Vance | `marcus.eng@company.internal` |
+| **VALIDATOR** | Elena Rostova | `elena.validator@company.internal` |
+
+---
+
+## 4. Running Application
 
 ### Sign in
 
@@ -160,19 +191,6 @@ A step-by-step test walkthrough for both roles is in [`MANUAL_TESTING.md`](MANUA
 ![Vacation rejection dialog](slide-screenshots/slide-08-reject-dialog.png)
 
 ![Team vacation planning calendar](slide-screenshots/slide-09-team-planning.png)
-
----
-
-## 4. Seeded Demo Accounts
-
-All accounts use the password **`demo1234`**.
-
-| Role | Name | Email |
-| :--- | :--- | :--- |
-| **REQUESTER** | Alex Morgan | `alex.requester@company.internal` |
-| **REQUESTER** | Sarah Chen | `sarah.dev@company.internal` |
-| **REQUESTER** | Marcus Vance | `marcus.eng@company.internal` |
-| **VALIDATOR** | Elena Rostova | `elena.validator@company.internal` |
 
 ---
 
