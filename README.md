@@ -15,7 +15,7 @@ In local development, the browser talks only to port `3000`. Vite forwards `/api
 
 ### Frontend Architecture
 
-The frontend follows a feature-based architecture. Authentication, vacation requests, approvals, and team planning each own their views, components, services, types, and validation logic. Shared UI, routing, API access, and utilities stay outside the feature folders.
+The frontend follows a feature-based architecture. Authentication, vacation requests, approvals, and team planning each own their views, components, services, types, and validation logic. Shared UI, routing, API access, and utilities stay outside the feature folders. See the [frontend architecture plan](.cursor/project_specific_assets/Architechture_And_System_Design/frontend_architecture.plan.md) for detailed decisions.
 
 ```text
 frontend/
