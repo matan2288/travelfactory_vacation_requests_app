@@ -5,8 +5,9 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
-  department: string;
+  // Mock-only profile fields; the backend does not return them.
+  department?: string;
   avatar?: string;
-  totalVacationDays: number;
-  usedVacationDays: number;
+  totalVacationDays?: number;
+  usedVacationDays?: number;
 }

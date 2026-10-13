@@ -57,6 +57,15 @@
             label="Corporate Email"
             placeholder="e.g. alex.requester@company.internal"
             required
+          />
+
+          <AppInput
+            id="login-password"
+            v-model="password"
+            type="password"
+            label="Password"
+            placeholder="Your password"
+            required
             :error="errorMessage"
           />
 
@@ -65,15 +74,19 @@
             variant="primary"
             class="w-full"
             :loading="isLoading"
-            :disabled="isLoading || !email.trim()"
+            :disabled="isLoading || !email.trim() || !password"
           >
             Sign In to Portal
           </AppButton>
         </form>
 
-        <!-- Mock Architecture Notice -->
         <div class="pt-2 border-t border-neutral-100 text-[11px] text-slate-400 leading-relaxed text-center">
-          Notice: Mock authentication is active for local evaluation. Production token issuance and RBAC will be enforced on the future PostgreSQL / TypeORM backend.
+          <template v-if="isMockMode">
+            Notice: Mock authentication is active for local evaluation. Any password is accepted.
+          </template>
+          <template v-else>
+            Demo accounts use the password <span class="font-mono text-slate-500">{{ demoPassword }}</span>.
+          </template>
         </div>
       </div>
     </div>
@@ -86,6 +99,10 @@ import AppInput from '@/components/common/AppInput.vue';
 import AppButton from '@/components/common/AppButton.vue';
 import { authService } from '../auth.service';
 import { getErrorMessage } from '@/utils/error.utils';
+import { isMockMode } from '@/services/api-client';
+
+// Matches DEMO_PASSWORD in backend/src/database/seed.ts.
+const DEMO_PASSWORD = 'demo1234';
 
 export default Vue.extend({
   name: 'LoginView',
@@ -96,13 +113,17 @@ export default Vue.extend({
   data() {
     return {
       email: '',
+      password: '',
       errorMessage: '',
       isLoading: false,
+      isMockMode,
+      demoPassword: DEMO_PASSWORD,
     };
   },
   methods: {
     async demoLogin(demoEmail: string) {
       this.email = demoEmail;
+      this.password = DEMO_PASSWORD;
       await this.performLogin();
     },
     async handleEmailLogin() {
@@ -112,8 +133,11 @@ export default Vue.extend({
       this.errorMessage = '';
       this.isLoading = true;
       try {
-        const user = await authService.login({ email: this.email });
-        if (user.role === 'VALIDATOR') {
+        const user = await authService.login({ email: this.email, password: this.password });
+        const redirect = this.$route.query.redirect;
+        if (typeof redirect === 'string' && redirect.startsWith('/') && !redirect.startsWith('//')) {
+          this.$router.push(redirect);
+        } else if (user.role === 'VALIDATOR') {
           this.$router.push('/approvals');
         } else {
           this.$router.push('/my-requests');

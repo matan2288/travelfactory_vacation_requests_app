@@ -134,8 +134,8 @@ class MockApiService implements IAuthApi, IVacationApi {
     return { ...this.currentUser };
   }
 
-  public getAvailableUsers(): User[] {
-    return [...this.users];
+  public async getRequesters(): Promise<User[]> {
+    return simulateNetworkLatency(this.users.filter((u) => u.role === 'REQUESTER'));
   }
 
   // Vacation API
@@ -201,7 +201,7 @@ class MockApiService implements IAuthApi, IVacationApi {
       filtered = filtered.filter(
         (r) =>
           r.requesterName.toLowerCase().includes(term) ||
-          r.requesterDepartment.toLowerCase().includes(term) ||
+          r.requesterDepartment?.toLowerCase().includes(term) ||
           (r.reason && r.reason.toLowerCase().includes(term))
       );
     }
@@ -253,7 +253,6 @@ class MockApiService implements IAuthApi, IVacationApi {
     const updated: VacationRequest = {
       ...target,
       status: 'APPROVED',
-      validatorId: current.id,
       validatorName: current.name,
       decisionDate: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -264,7 +263,7 @@ class MockApiService implements IAuthApi, IVacationApi {
     // Update user used vacation days count
     const userIndex = this.users.findIndex((u) => u.id === target.requesterId);
     if (userIndex !== -1) {
-      this.users[userIndex].usedVacationDays += target.daysCount;
+      this.users[userIndex].usedVacationDays = (this.users[userIndex].usedVacationDays ?? 0) + target.daysCount;
     }
 
     this.saveState();
@@ -300,9 +299,8 @@ class MockApiService implements IAuthApi, IVacationApi {
     const updated: VacationRequest = {
       ...target,
       status: 'REJECTED',
-      validatorId: current.id,
       validatorName: current.name,
-      validatorComment: comment.trim(),
+      comments: comment.trim(),
       decisionDate: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };

@@ -115,7 +115,7 @@
                 <div class="font-semibold text-slate-900 truncate max-w-[160px]">
                   {{ member.user.name }}
                 </div>
-                <div class="text-xs text-slate-400 truncate max-w-[160px]">
+                <div v-if="member.user.department" class="text-xs text-slate-400 truncate max-w-[160px]">
                   {{ member.user.department }}
                 </div>
               </td>

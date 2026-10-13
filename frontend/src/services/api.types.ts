@@ -19,6 +19,7 @@ export interface IVacationApi {
   getAllRequests(params: VacationFilterParams): Promise<PaginatedResponse<VacationRequest>>;
   approveRequest(id: string): Promise<VacationRequest>;
   rejectRequest(id: string, comment: string): Promise<VacationRequest>;
+  getRequesters(): Promise<User[]>;
   getTeamPlanning(year: number, month: number): Promise<TeamPlanningData>;
 }
 

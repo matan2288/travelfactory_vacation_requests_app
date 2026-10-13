@@ -5,17 +5,17 @@ export interface VacationRequest {
   requesterId: string;
   requesterName: string;
   requesterEmail: string;
-  requesterDepartment: string;
   startDate: string; // ISO format: YYYY-MM-DD
   endDate: string;   // ISO format: YYYY-MM-DD
   daysCount: number;
-  reason?: string;
+  reason?: string | null;
   status: VacationStatus;
+  comments?: string | null;
   createdAt: string; // ISO string
   updatedAt: string; // ISO string
-  validatorId?: string;
+  // Mock-only fields; the backend does not return them.
+  requesterDepartment?: string;
   validatorName?: string;
-  validatorComment?: string;
   decisionDate?: string;
 }
 

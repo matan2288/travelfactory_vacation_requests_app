@@ -108,7 +108,7 @@
             {{ req.requesterName }}
           </div>
           <div class="text-xs text-slate-500">
-            {{ req.requesterDepartment }}
+            {{ req.requesterDepartment || req.requesterEmail }}
           </div>
         </td>
 
@@ -135,16 +135,16 @@
           <div v-else class="text-slate-400">—</div>
 
           <div
-            v-if="req.status === 'REJECTED' && req.validatorComment"
+            v-if="req.status === 'REJECTED' && req.comments"
             class="mt-1 text-xs text-slate-500 leading-normal"
           >
-            <span class="font-medium text-slate-700">Rejection note:</span> {{ req.validatorComment }}
+            <span class="font-medium text-slate-700">Rejection note:</span> {{ req.comments }}
           </div>
           <div
-            v-else-if="req.status === 'APPROVED' && req.validatorComment"
+            v-else-if="req.status === 'APPROVED' && req.comments"
             class="mt-1 text-xs text-slate-500 leading-normal"
           >
-            <span class="font-medium text-slate-700">Note:</span> {{ req.validatorComment }}
+            <span class="font-medium text-slate-700">Note:</span> {{ req.comments }}
           </div>
         </td>
 

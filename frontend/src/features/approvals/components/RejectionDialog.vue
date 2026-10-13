@@ -9,7 +9,7 @@
       <div class="p-3.5 bg-neutral-50 rounded-xl border border-neutral-200/80 text-xs text-slate-700 space-y-1">
         <div class="flex items-center justify-between">
           <span class="font-semibold text-slate-900">{{ request.requesterName }}</span>
-          <span class="text-slate-500 text-xs">{{ request.requesterDepartment }}</span>
+          <span class="text-slate-500 text-xs">{{ request.requesterDepartment || request.requesterEmail }}</span>
         </div>
         <div class="tabular-nums font-medium text-slate-800">
           {{ formatDisplayDate(request.startDate) }} — {{ formatDisplayDate(request.endDate) }} ({{ request.daysCount }} days)

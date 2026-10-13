@@ -74,7 +74,7 @@
             :key="user.id"
             :value="user.id"
           >
-            {{ user.name }} ({{ user.department }})
+            {{ user.name }}<template v-if="user.department"> ({{ user.department }})</template>
           </option>
         </select>
       </div>
@@ -110,7 +110,7 @@
 import Vue from 'vue';
 import type { VacationStatus } from '@/features/vacation-requests/vacation-requests.types';
 import type { User } from '@/types/user.types';
-import { mockApi } from '@/mocks/mock-api';
+import { vacationApiClient } from '@/services/api-client';
 
 export default Vue.extend({
   name: 'ApprovalFilters',
@@ -128,10 +128,17 @@ export default Vue.extend({
       default: '',
     },
   },
-  computed: {
-    availableUsers(): User[] {
-      return mockApi.getAvailableUsers();
-    },
+  data() {
+    return {
+      availableUsers: [] as User[],
+    };
+  },
+  async created() {
+    try {
+      this.availableUsers = await vacationApiClient.getRequesters();
+    } catch {
+      // The filter falls back to "All Team Members" only; the list itself still loads.
+    }
   },
   methods: {
     onStatusChange(status: VacationStatus | 'ALL') {

@@ -58,7 +58,7 @@
 
           <!-- Clear & Minimalist Rejection Feedback (Unboxed & Uncongested) -->
           <div
-            v-if="req.status === 'REJECTED' && req.validatorComment"
+            v-if="req.status === 'REJECTED' && req.comments"
             class="mt-1.5"
           >
             <button
@@ -72,7 +72,7 @@
               <span class="underline underline-offset-2 decoration-neutral-300 group-hover:decoration-slate-800">Reviewer Note</span>
             </button>
             <p class="mt-1 text-xs text-slate-500 max-w-xs leading-normal">
-              <span class="font-medium text-slate-700">Reason:</span> {{ req.validatorComment }}
+              <span class="font-medium text-slate-700">Reason:</span> {{ req.comments }}
             </p>
           </div>
         </td>
@@ -112,7 +112,7 @@
             Explanation from Reviewer
           </div>
           <div class="p-4 bg-neutral-50/70 border border-neutral-200/70 rounded-xl text-sm text-slate-700 leading-relaxed">
-            {{ selectedFeedback.validatorComment }}
+            {{ selectedFeedback.comments }}
           </div>
           <div v-if="selectedFeedback.validatorName" class="mt-2 text-xs text-slate-400">
             Decision recorded by {{ selectedFeedback.validatorName }}

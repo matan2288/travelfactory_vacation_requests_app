@@ -5,6 +5,7 @@ import type {
 } from '@/features/vacation-requests/vacation-requests.types';
 import type { PaginatedResponse } from '@/types/common.types';
 import { vacationApiClient } from '@/services/api-client';
+import { getErrorMessage } from '@/utils/error.utils';
 
 interface ApprovalsState {
   data: PaginatedResponse<VacationRequest>;
@@ -67,7 +68,7 @@ export const approvalsService = {
       const response = await vacationApiClient.getAllRequests(state.filters);
       state.data = response;
     } catch (err: unknown) {
-      state.error = err instanceof Error ? err.message : 'Failed to load requests';
+      state.error = getErrorMessage(err);
       throw err;
     } finally {
       state.isLoading = false;
@@ -83,7 +84,7 @@ export const approvalsService = {
       await this.loadRequests();
       return updated;
     } catch (err: unknown) {
-      state.error = err instanceof Error ? err.message : 'Failed to approve request';
+      state.error = getErrorMessage(err);
       throw err;
     } finally {
       state.actionInProgressId = null;
@@ -99,7 +100,7 @@ export const approvalsService = {
       await this.loadRequests();
       return updated;
     } catch (err: unknown) {
-      state.error = err instanceof Error ? err.message : 'Failed to reject request';
+      state.error = getErrorMessage(err);
       throw err;
     } finally {
       state.actionInProgressId = null;

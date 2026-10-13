@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import type { TeamPlanningData } from '@/services/api.types';
 import { vacationApiClient } from '@/services/api-client';
+import { getErrorMessage } from '@/utils/error.utils';
 
 interface TeamPlanningState {
   year: number;
@@ -44,7 +45,7 @@ export const teamPlanningService = {
       const result = await vacationApiClient.getTeamPlanning(state.year, state.month);
       state.data = result;
     } catch (err: unknown) {
-      state.error = err instanceof Error ? err.message : 'Failed to load team planning data';
+      state.error = getErrorMessage(err);
       throw err;
     } finally {
       state.isLoading = false;

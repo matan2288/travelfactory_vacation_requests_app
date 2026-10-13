@@ -54,9 +54,8 @@ export const SEEDED_REQUESTS: VacationRequest[] = [
     status: 'APPROVED',
     createdAt: '2026-10-01T09:30:00.000Z',
     updatedAt: '2026-10-02T14:15:00.000Z',
-    validatorId: 'user-elena-201',
     validatorName: 'Elena Rostova',
-    validatorComment: 'Approved. Enjoy your time off!',
+    comments: 'Approved. Enjoy your time off!',
     decisionDate: '2026-10-02T14:15:00.000Z',
   },
   {
@@ -86,9 +85,8 @@ export const SEEDED_REQUESTS: VacationRequest[] = [
     status: 'REJECTED',
     createdAt: '2026-08-25T10:00:00.000Z',
     updatedAt: '2026-08-26T16:20:00.000Z',
-    validatorId: 'user-elena-201',
     validatorName: 'Elena Rostova',
-    validatorComment: 'Overlaps with the core sprint delivery and quarterly client milestone. Please reschedule for October.',
+    comments: 'Overlaps with the core sprint delivery and quarterly client milestone. Please reschedule for October.',
     decisionDate: '2026-08-26T16:20:00.000Z',
   },
   {
@@ -104,9 +102,8 @@ export const SEEDED_REQUESTS: VacationRequest[] = [
     status: 'APPROVED',
     createdAt: '2026-10-02T13:45:00.000Z',
     updatedAt: '2026-10-03T09:10:00.000Z',
-    validatorId: 'user-elena-201',
     validatorName: 'Elena Rostova',
-    validatorComment: 'Approved. Handover confirmed with platform team.',
+    comments: 'Approved. Handover confirmed with platform team.',
     decisionDate: '2026-10-03T09:10:00.000Z',
   },
   {
@@ -150,9 +147,8 @@ export const SEEDED_REQUESTS: VacationRequest[] = [
     status: 'APPROVED',
     createdAt: '2026-09-30T10:00:00.000Z',
     updatedAt: '2026-10-01T11:00:00.000Z',
-    validatorId: 'user-elena-201',
     validatorName: 'Elena Rostova',
-    validatorComment: 'Approved.',
+    comments: 'Approved.',
     decisionDate: '2026-10-01T11:00:00.000Z',
   },
 ];

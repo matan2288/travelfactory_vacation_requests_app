@@ -2,7 +2,7 @@ import type { User } from '@/types/user.types';
 
 export interface LoginCredentials {
   email: string;
-  password?: string;
+  password: string;
 }
 
 export interface AuthSession {

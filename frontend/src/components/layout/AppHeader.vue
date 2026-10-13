@@ -40,7 +40,7 @@
       <!-- Zone 3: User Profile & Primary Action -->
       <div class="flex items-center gap-3 shrink-0">
         <!-- Quick Switch Demo Account Dropdown for test evaluators -->
-        <div class="hidden sm:flex items-center gap-2 pr-2 border-r border-neutral-200">
+        <div v-if="isMockMode" class="hidden sm:flex items-center gap-2 pr-2 border-r border-neutral-200">
           <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Demo User:</span>
           <select
             :value="currentUser ? currentUser.id : ''"
@@ -83,9 +83,13 @@
 <script lang="ts">
 import Vue from 'vue';
 import { authService } from '@/features/auth/auth.service';
+import { isMockMode } from '@/services/api-client';
 
 export default Vue.extend({
   name: 'AppHeader',
+  data() {
+    return { isMockMode };
+  },
   computed: {
     currentUser() {
       return authService.currentUser;

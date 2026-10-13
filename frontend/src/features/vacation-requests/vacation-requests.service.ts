@@ -5,6 +5,7 @@ import type {
 } from './vacation-requests.types';
 import { vacationApiClient } from '@/services/api-client';
 import { authService } from '@/features/auth/auth.service';
+import { getErrorMessage } from '@/utils/error.utils';
 
 interface VacationRequestsState {
   requests: VacationRequest[];
@@ -67,7 +68,7 @@ export const vacationRequestsService = {
       state.requests = items;
       return items;
     } catch (err: unknown) {
-      state.error = err instanceof Error ? err.message : 'Failed to fetch vacation requests';
+      state.error = getErrorMessage(err);
       throw err;
     } finally {
       state.isLoading = false;
@@ -82,7 +83,7 @@ export const vacationRequestsService = {
       state.requests.unshift(newReq);
       return newReq;
     } catch (err: unknown) {
-      state.error = err instanceof Error ? err.message : 'Failed to submit request';
+      state.error = getErrorMessage(err);
       throw err;
     } finally {
       state.isSubmitting = false;

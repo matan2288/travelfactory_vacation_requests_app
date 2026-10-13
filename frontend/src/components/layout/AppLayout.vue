@@ -14,10 +14,10 @@
           <span aria-hidden="true">·</span>
           <span>Vue 2.7 Monorepo</span>
           <span aria-hidden="true">·</span>
-          <span class="text-xs text-slate-400">Mock API Adapter Active</span>
+          <span class="text-xs text-slate-400">{{ isMockMode ? 'Mock API Adapter Active' : 'Connected to API' }}</span>
         </div>
 
-        <div class="flex items-center gap-4">
+        <div v-if="isMockMode" class="flex items-center gap-4">
           <button
             type="button"
             class="text-xs text-slate-500 hover:text-slate-800 underline underline-offset-2 transition-colors cursor-pointer"
@@ -37,12 +37,16 @@ import AppHeader from './AppHeader.vue';
 import AppSidebar from './AppSidebar.vue';
 import { authService } from '@/features/auth/auth.service';
 import { mockApi } from '@/mocks/mock-api';
+import { isMockMode } from '@/services/api-client';
 
 export default Vue.extend({
   name: 'AppLayout',
   components: {
     AppHeader,
     AppSidebar,
+  },
+  data() {
+    return { isMockMode };
   },
   computed: {
     currentUser() {
