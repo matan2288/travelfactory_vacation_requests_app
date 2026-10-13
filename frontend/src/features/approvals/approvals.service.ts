@@ -75,11 +75,11 @@ export const approvalsService = {
     }
   },
 
-  async approve(id: string): Promise<VacationRequest> {
+  async approve(id: string, comment?: string): Promise<VacationRequest> {
     state.actionInProgressId = id;
     state.error = null;
     try {
-      const updated = await vacationApiClient.approveRequest(id);
+      const updated = await vacationApiClient.approveRequest(id, comment);
       // Refresh list to maintain pagination and ordering
       await this.loadRequests();
       return updated;

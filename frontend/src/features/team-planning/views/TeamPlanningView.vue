@@ -1,9 +1,6 @@
 <template>
-  <div class="max-w-6xl mx-auto px-6 md:px-8 pt-8 sm:pt-12 pb-16">
-    <!-- Typographic Section Label -->
-    <div class="text-xs font-semibold tracking-wider text-slate-400 uppercase mb-2">
-      03 / TEAM PLANNING
-    </div>
+  <div class="max-w-7xl mx-auto px-6 md:px-8 pt-8 sm:pt-12 pb-16">
+    <SignedInAs />
 
     <!-- Header & Month Controls -->
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
@@ -129,30 +126,35 @@
                   isWeekend(day) ? 'bg-neutral-50/60' : '',
                 ]"
               >
-                <div
+                <button
                   v-if="getDayStatus(member.requests, day)"
+                  type="button"
                   :class="[
-                    'w-full h-7 rounded-sm flex items-center justify-center text-[10px] font-semibold text-white transition-opacity cursor-help',
+                    'w-full h-7 rounded-sm block transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-1',
                     getDayStatus(member.requests, day)?.status === 'APPROVED'
                       ? 'bg-emerald-600 hover:bg-emerald-700'
                       : 'bg-amber-500 hover:bg-amber-600',
                   ]"
                   :title="getDayTooltip(member.requests, day)"
-                >
-                  <span class="sr-only">Vacation</span>
-                </div>
+                  :aria-label="getDayTooltip(member.requests, day)"
+                  @click="selectedRequest = getDayStatus(member.requests, day)"
+                />
               </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
+
+    <RequestDetailsDialog :request="selectedRequest" @close="selectedRequest = null" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import AppButton from '@/components/common/AppButton.vue';
+import SignedInAs from '@/components/layout/SignedInAs.vue';
+import RequestDetailsDialog from '@/features/vacation-requests/components/RequestDetailsDialog.vue';
 import { teamPlanningService } from '../team-planning.service';
 import type { VacationRequest } from '@/features/vacation-requests/vacation-requests.types';
 
@@ -160,6 +162,13 @@ export default Vue.extend({
   name: 'TeamPlanningView',
   components: {
     AppButton,
+    SignedInAs,
+    RequestDetailsDialog,
+  },
+  data() {
+    return {
+      selectedRequest: null as VacationRequest | null,
+    };
   },
   computed: {
     planningData() {
@@ -214,7 +223,7 @@ export default Vue.extend({
     getDayTooltip(requests: VacationRequest[], day: number): string {
       const req = this.getDayStatus(requests, day);
       if (!req) return '';
-      const statusText = req.status === 'APPROVED' ? 'Approved' : 'Pending Review';
+      const statusText = req.status === 'APPROVED' ? 'Approved, review completed' : 'Pending Review';
       return `${req.requesterName}: ${req.startDate} to ${req.endDate} (${req.daysCount} days) - ${statusText}${req.reason ? ` - "${req.reason}"` : ''}`;
     },
   },

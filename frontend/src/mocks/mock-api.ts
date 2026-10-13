@@ -126,14 +126,6 @@ class MockApiService implements IAuthApi, IVacationApi {
     return simulateNetworkLatency(undefined);
   }
 
-  public switchDemoUser(userId: string): User {
-    const target = this.users.find((u) => u.id === userId);
-    if (!target) throw new Error('User not found');
-    this.currentUser = target;
-    this.saveState();
-    return { ...this.currentUser };
-  }
-
   public async getRequesters(): Promise<User[]> {
     return simulateNetworkLatency(this.users.filter((u) => u.role === 'REQUESTER'));
   }
@@ -230,7 +222,7 @@ class MockApiService implements IAuthApi, IVacationApi {
     });
   }
 
-  public async approveRequest(id: string): Promise<VacationRequest> {
+  public async approveRequest(id: string, comment?: string): Promise<VacationRequest> {
     const current = await this.getCurrentUser();
 
     // Rule 6: Only validators can approve
@@ -254,6 +246,7 @@ class MockApiService implements IAuthApi, IVacationApi {
       ...target,
       status: 'APPROVED',
       validatorName: current.name,
+      comments: comment?.trim() || null,
       decisionDate: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };

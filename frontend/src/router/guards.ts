@@ -34,13 +34,11 @@ export async function authGuard(to: Route, _from: Route, next: NavigationGuardNe
       return;
     }
 
-    // Check role authorization for Validator-only routes
-    if (to.matched.some((record) => record.meta?.requiredRole === 'VALIDATOR')) {
-      if (user?.role !== 'VALIDATOR') {
-        // Unauthorized role: redirect to user's permitted portal
-        next('/my-requests');
-        return;
-      }
+    // Role-only routes: send the user to their own landing page instead
+    const requiredRole = to.matched.find((record) => record.meta?.requiredRole)?.meta.requiredRole;
+    if (requiredRole && user?.role !== requiredRole) {
+      next(user?.role === 'VALIDATOR' ? '/approvals' : '/my-requests');
+      return;
     }
   }
 

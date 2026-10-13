@@ -1,11 +1,14 @@
 <template>
   <div>
-    <AppTable :loading="loading" :is-empty="requests.length === 0" :colspan="5">
+    <AppTable :loading="loading" :is-empty="requests.length === 0" :colspan="6">
       <template #header>
         <th class="py-3 px-4 sm:px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-          Date Interval
+          Start Date
         </th>
-        <th class="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">
+        <th class="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          End Date
+        </th>
+        <th class="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
           Days
         </th>
         <th class="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -39,26 +42,29 @@
         class="hover:bg-neutral-50/70 transition-colors"
       >
         <td class="py-3.5 px-4 sm:px-6 text-sm">
-          <div class="font-medium text-slate-900 tabular-nums">
-            {{ formatDisplayDate(req.startDate) }} — {{ formatDisplayDate(req.endDate) }}
+          <div class="font-medium text-slate-900 tabular-nums whitespace-nowrap">
+            {{ formatDisplayDate(req.startDate) }}
           </div>
           <div v-if="req.status === 'APPROVED'" class="text-[11px] text-slate-400 mt-0.5">
             Locked · Approved requests cannot be modified
           </div>
         </td>
 
-        <td class="py-3.5 px-4 text-sm text-slate-700 text-right tabular-nums font-semibold">
+        <td class="py-3.5 px-4 text-sm font-medium text-slate-900 tabular-nums whitespace-nowrap">
+          {{ formatDisplayDate(req.endDate) }}
+        </td>
+
+        <td class="py-3.5 px-4 text-sm text-slate-700 tabular-nums font-semibold">
           {{ req.daysCount }}
         </td>
 
         <td class="py-3.5 px-4 text-sm align-top">
           <div class="flex items-center gap-2">
-            <VacationStatus :status="req.status" />
+            <VacationStatus :status="req.status" pill />
           </div>
 
-          <!-- Clear & Minimalist Rejection Feedback (Unboxed & Uncongested) -->
           <div
-            v-if="req.status === 'REJECTED' && req.comments"
+            v-if="req.comments"
             class="mt-1.5"
           >
             <button
@@ -71,8 +77,8 @@
               </svg>
               <span class="underline underline-offset-2 decoration-neutral-300 group-hover:decoration-slate-800">Reviewer Note</span>
             </button>
-            <p class="mt-1 text-xs text-slate-500 max-w-xs leading-normal">
-              <span class="font-medium text-slate-700">Reason:</span> {{ req.comments }}
+            <p class="mt-1 text-xs text-slate-500 max-w-xs leading-normal truncate">
+              {{ req.comments }}
             </p>
           </div>
         </td>
@@ -87,58 +93,15 @@
       </tr>
     </AppTable>
 
-    <!-- Dedicated Rejection Feedback Modal -->
-    <AppModal
-      :is-open="selectedFeedback !== null"
-      title="Reviewer Feedback"
-      @close="selectedFeedback = null"
-    >
-      <div v-if="selectedFeedback" class="space-y-4">
-        <div class="p-3.5 bg-neutral-50 rounded-xl border border-neutral-200/80 text-xs text-slate-700 space-y-1">
-          <div class="flex items-center justify-between">
-            <span class="font-semibold text-slate-900">Vacation Interval:</span>
-            <span class="text-slate-500 tabular-nums font-medium">{{ selectedFeedback.daysCount }} days</span>
-          </div>
-          <div class="tabular-nums font-medium text-slate-800">
-            {{ formatDisplayDate(selectedFeedback.startDate) }} — {{ formatDisplayDate(selectedFeedback.endDate) }}
-          </div>
-          <div v-if="selectedFeedback.reason" class="text-slate-500 italic pt-1">
-            Requester reason: "{{ selectedFeedback.reason }}"
-          </div>
-        </div>
-
-        <div>
-          <div class="text-xs font-semibold text-slate-800 uppercase tracking-wider mb-1.5">
-            Explanation from Reviewer
-          </div>
-          <div class="p-4 bg-neutral-50/70 border border-neutral-200/70 rounded-xl text-sm text-slate-700 leading-relaxed">
-            {{ selectedFeedback.comments }}
-          </div>
-          <div v-if="selectedFeedback.validatorName" class="mt-2 text-xs text-slate-400">
-            Decision recorded by {{ selectedFeedback.validatorName }}
-          </div>
-        </div>
-      </div>
-
-      <template #footer>
-        <AppButton
-          variant="primary"
-          size="sm"
-          @click="selectedFeedback = null"
-        >
-          Dismiss
-        </AppButton>
-      </template>
-    </AppModal>
+    <RequestDetailsDialog :request="selectedFeedback" @close="selectedFeedback = null" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import AppTable from '@/components/common/AppTable.vue';
-import AppModal from '@/components/common/AppModal.vue';
-import AppButton from '@/components/common/AppButton.vue';
 import VacationStatus from './VacationStatus.vue';
+import RequestDetailsDialog from './RequestDetailsDialog.vue';
 import type { VacationRequest } from '../vacation-requests.types';
 import { formatDisplayDate, formatShortDate } from '@/utils/date.utils';
 
@@ -146,9 +109,8 @@ export default Vue.extend({
   name: 'VacationRequestList',
   components: {
     AppTable,
-    AppModal,
-    AppButton,
     VacationStatus,
+    RequestDetailsDialog,
   },
   props: {
     requests: {

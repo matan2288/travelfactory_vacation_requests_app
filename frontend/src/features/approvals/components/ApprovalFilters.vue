@@ -1,71 +1,32 @@
 <template>
-  <div class="p-4 bg-neutral-50 rounded-2xl border border-neutral-200/80 mb-6 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-    <!-- Status Segmented Filter (Functional buttons with click handlers) -->
-    <div class="flex items-center gap-1 p-1 bg-white border border-neutral-200/80 rounded-xl overflow-x-auto">
+  <div class="mb-6 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+    <!-- Status tabs -->
+    <div class="flex items-center gap-1 overflow-x-auto" role="group" aria-label="Filter by status">
       <button
+        v-for="option in statusOptions"
+        :key="option.value"
         type="button"
+        :aria-pressed="currentStatus === option.value"
         :class="[
-          'px-3 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer',
-          currentStatus === 'ALL'
+          'px-3.5 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer',
+          currentStatus === option.value
             ? 'bg-slate-900 text-white shadow-2xs'
-            : 'text-slate-600 hover:text-slate-900',
+            : 'text-slate-700 hover:text-slate-900 hover:bg-neutral-100',
         ]"
-        @click="onStatusChange('ALL')"
+        @click="onStatusChange(option.value)"
       >
-        All Requests
-      </button>
-
-      <button
-        type="button"
-        :class="[
-          'px-3 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer',
-          currentStatus === 'PENDING'
-            ? 'bg-slate-900 text-white shadow-2xs'
-            : 'text-slate-600 hover:text-slate-900',
-        ]"
-        @click="onStatusChange('PENDING')"
-      >
-        Pending Review
-      </button>
-
-      <button
-        type="button"
-        :class="[
-          'px-3 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer',
-          currentStatus === 'APPROVED'
-            ? 'bg-slate-900 text-white shadow-2xs'
-            : 'text-slate-600 hover:text-slate-900',
-        ]"
-        @click="onStatusChange('APPROVED')"
-      >
-        Approved
-      </button>
-
-      <button
-        type="button"
-        :class="[
-          'px-3 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap shrink-0 cursor-pointer',
-          currentStatus === 'REJECTED'
-            ? 'bg-slate-900 text-white shadow-2xs'
-            : 'text-slate-600 hover:text-slate-900',
-        ]"
-        @click="onStatusChange('REJECTED')"
-      >
-        Rejected
+        {{ option.label }}
       </button>
     </div>
 
-    <!-- Requester Dropdown & Search -->
+    <!-- Requester dropdown & search -->
     <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-      <!-- Requester filter -->
-      <div class="flex items-center gap-2">
-        <label for="requester-filter" class="text-xs text-slate-500 whitespace-nowrap hidden sm:inline">
-          Requester:
-        </label>
+      <div class="flex items-center">
+        <label for="requester-filter" class="sr-only">Requester</label>
         <select
           id="requester-filter"
           :value="currentRequester"
-          class="text-xs py-2 px-3 border border-neutral-200 rounded-xl bg-white text-slate-800 font-medium focus:outline-none focus:border-slate-900"
+          class="text-sm py-2 px-3 border border-neutral-200 hover:border-neutral-300 rounded-xl bg-white text-slate-800 focus:outline-none focus:border-slate-900 shadow-2xs cursor-pointer"
           @change="onRequesterChange($event.target.value)"
         >
           <option value="ALL">All Team Members</option>
@@ -80,16 +41,17 @@
       </div>
 
       <!-- Search input -->
-      <div class="relative min-w-[200px]">
+      <div class="relative min-w-[220px]">
         <input
-          type="text"
+          type="search"
           :value="searchTerm"
-          placeholder="Filter by keyword..."
-          class="w-full pl-8 pr-3 py-1.5 text-xs bg-white text-slate-900 border border-neutral-200 hover:border-neutral-300 rounded-xl focus:outline-none focus:border-slate-900 transition-colors"
+          placeholder="Search Requester..."
+          aria-label="Search requester"
+          class="w-full pl-9 pr-3 py-2 text-sm bg-white text-slate-900 border border-neutral-200 hover:border-neutral-300 rounded-xl focus:outline-none focus:border-slate-900 shadow-2xs transition-colors placeholder:text-slate-500"
           @input="onSearchInput($event.target.value)"
         />
         <svg
-          class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+          class="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -131,6 +93,12 @@ export default Vue.extend({
   data() {
     return {
       availableUsers: [] as User[],
+      statusOptions: [
+        { value: 'ALL', label: 'All Requests' },
+        { value: 'PENDING', label: 'Pending Review' },
+        { value: 'APPROVED', label: 'Approved' },
+        { value: 'REJECTED', label: 'Rejected' },
+      ] as { value: VacationStatus | 'ALL'; label: string }[],
     };
   },
   async created() {

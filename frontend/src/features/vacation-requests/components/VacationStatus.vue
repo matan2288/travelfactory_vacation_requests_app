@@ -1,5 +1,11 @@
 <template>
-  <span :class="['inline-flex items-center gap-1.5 text-xs font-semibold tracking-wide', statusClasses]">
+  <span
+    :class="[
+      'inline-flex items-center gap-1.5 text-xs font-semibold tracking-wide',
+      statusClasses,
+      pill ? ['px-2.5 py-1 rounded-full border', pillClasses] : '',
+    ]"
+  >
     <!-- Icon for non-color-only accessibility -->
     <svg v-if="status === 'APPROVED'" class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
@@ -27,6 +33,10 @@ export default Vue.extend({
       required: true,
       validator: (val: string) => ['PENDING', 'APPROVED', 'REJECTED'].includes(val),
     },
+    pill: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     displayLabel(): string {
@@ -39,6 +49,18 @@ export default Vue.extend({
           return 'Rejected';
         default:
           return this.status;
+      }
+    },
+    pillClasses(): string {
+      switch (this.status) {
+        case 'APPROVED':
+          return 'bg-emerald-50 border-emerald-200';
+        case 'PENDING':
+          return 'bg-amber-50 border-amber-200';
+        case 'REJECTED':
+          return 'bg-red-50 border-red-200';
+        default:
+          return 'bg-neutral-50 border-neutral-200';
       }
     },
     statusClasses(): string {

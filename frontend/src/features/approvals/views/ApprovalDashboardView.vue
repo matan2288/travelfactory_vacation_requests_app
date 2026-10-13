@@ -1,9 +1,6 @@
 <template>
-  <div class="max-w-6xl mx-auto px-6 md:px-8 pt-8 sm:pt-12 pb-16">
-    <!-- Typographic Section Label -->
-    <div class="text-xs font-semibold tracking-wider text-slate-400 uppercase mb-2">
-      02 / APPROVALS QUEUE
-    </div>
+  <div class="max-w-7xl mx-auto px-6 md:px-8 pt-8 sm:pt-12 pb-16">
+    <SignedInAs />
 
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
@@ -60,22 +57,25 @@
     <AppTable
       :loading="isLoading"
       :is-empty="items.length === 0"
-      :colspan="6"
+      :colspan="7"
     >
       <template #header>
         <th class="py-3 px-4 sm:px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider">
           Requester
         </th>
         <th class="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-          Dates
+          Start Date
         </th>
-        <th class="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">
+        <th class="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          End Date
+        </th>
+        <th class="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
           Days
         </th>
         <th class="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
           Status
         </th>
-        <th class="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">
+        <th class="py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider hidden xl:table-cell">
           Reason & Feedback
         </th>
         <th class="py-3 px-4 sm:px-6 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">
@@ -104,48 +104,58 @@
       >
         <!-- Requester -->
         <td class="py-3.5 px-4 sm:px-6 text-sm">
-          <div class="font-semibold text-slate-900">
-            {{ req.requesterName }}
-          </div>
-          <div class="text-xs text-slate-500">
-            {{ req.requesterDepartment || req.requesterEmail }}
+          <div class="flex items-center gap-3">
+            <UserAvatar :name="req.requesterName" :email="req.requesterEmail" />
+            <div class="min-w-0">
+              <button
+                type="button"
+                class="block max-w-full font-semibold text-slate-900 truncate text-left cursor-pointer hover:underline underline-offset-2"
+                :aria-label="`View details of ${req.requesterName}'s request`"
+                @click="detailsRequest = req"
+              >
+                {{ req.requesterName }}
+              </button>
+              <div class="text-xs text-slate-500 truncate">
+                {{ req.requesterEmail }}
+              </div>
+            </div>
           </div>
         </td>
 
-        <!-- Dates -->
         <td class="py-3.5 px-4 text-sm font-medium text-slate-800 tabular-nums whitespace-nowrap">
-          {{ formatDisplayDate(req.startDate) }} — {{ formatDisplayDate(req.endDate) }}
+          {{ formatDisplayDate(req.startDate) }}
+        </td>
+
+        <td class="py-3.5 px-4 text-sm font-medium text-slate-800 tabular-nums whitespace-nowrap">
+          {{ formatDisplayDate(req.endDate) }}
         </td>
 
         <!-- Days -->
-        <td class="py-3.5 px-4 text-sm font-semibold text-slate-900 text-right tabular-nums">
+        <td class="py-3.5 px-4 text-sm font-semibold text-slate-900 tabular-nums">
           {{ req.daysCount }}
         </td>
 
         <!-- Status -->
         <td class="py-3.5 px-4 text-sm whitespace-nowrap">
-          <VacationStatus :status="req.status" />
+          <VacationStatus :status="req.status" pill />
         </td>
 
         <!-- Reason & Feedback -->
-        <td class="py-3.5 px-4 text-xs text-slate-600 hidden md:table-cell max-w-xs">
-          <div v-if="req.reason" class="truncate text-slate-700">
-            {{ req.reason }}
-          </div>
-          <div v-else class="text-slate-400">—</div>
-
-          <div
-            v-if="req.status === 'REJECTED' && req.comments"
-            class="mt-1 text-xs text-slate-500 leading-normal"
+        <td class="py-3.5 px-4 text-xs text-slate-600 hidden xl:table-cell max-w-[200px]">
+          <button
+            type="button"
+            class="block w-full text-left cursor-pointer group"
+            :aria-label="`View details of ${req.requesterName}'s request`"
+            @click="detailsRequest = req"
           >
-            <span class="font-medium text-slate-700">Rejection note:</span> {{ req.comments }}
-          </div>
-          <div
-            v-else-if="req.status === 'APPROVED' && req.comments"
-            class="mt-1 text-xs text-slate-500 leading-normal"
-          >
-            <span class="font-medium text-slate-700">Note:</span> {{ req.comments }}
-          </div>
+            <span class="block truncate text-slate-700 underline underline-offset-2 decoration-neutral-300 group-hover:decoration-slate-800">
+              {{ req.reason || 'View details' }}
+            </span>
+            <span v-if="req.comments" class="block mt-1 truncate text-slate-500">
+              <span class="font-medium text-slate-700">{{ req.status === 'REJECTED' ? 'Rejection note:' : 'Note:' }}</span>
+              {{ req.comments }}
+            </span>
+          </button>
         </td>
 
         <!-- Actions -->
@@ -154,9 +164,8 @@
             <AppButton
               size="sm"
               variant="primary"
-              :loading="actionId === req.id && isApproving"
               :disabled="actionId !== null"
-              @click="handleApprove(req)"
+              @click="openDecisionDialog(req, 'approve')"
             >
               Approve
             </AppButton>
@@ -165,14 +174,14 @@
               size="sm"
               variant="danger"
               :disabled="actionId !== null"
-              @click="openRejectionDialog(req)"
+              @click="openDecisionDialog(req, 'reject')"
             >
               Reject
             </AppButton>
           </div>
 
           <div v-else class="text-xs text-slate-400">
-            {{ req.status === 'APPROVED' ? 'Approved' : 'Rejected' }}
+            {{ req.status === 'APPROVED' ? 'Review completed' : 'Rejected' }}
           </div>
         </td>
       </tr>
@@ -188,14 +197,16 @@
       @change-page-size="onPageSizeChange"
     />
 
-    <!-- Rejection Dialog -->
-    <RejectionDialog
-      :is-open="isRejectionDialogOpen"
-      :request="targetRejectRequest"
-      :is-submitting="isRejecting"
-      @confirm="handleRejectConfirm"
-      @cancel="closeRejectionDialog"
+    <DecisionDialog
+      :is-open="decisionRequest !== null"
+      :mode="decisionMode"
+      :request="decisionRequest"
+      :is-submitting="isSubmitting"
+      @confirm="handleDecisionConfirm"
+      @cancel="closeDecisionDialog"
     />
+
+    <RequestDetailsDialog :request="detailsRequest" @close="detailsRequest = null" />
   </div>
 </template>
 
@@ -204,9 +215,12 @@ import Vue from 'vue';
 import AppTable from '@/components/common/AppTable.vue';
 import AppButton from '@/components/common/AppButton.vue';
 import AppPagination from '@/components/common/AppPagination.vue';
+import SignedInAs from '@/components/layout/SignedInAs.vue';
+import UserAvatar from '@/components/common/UserAvatar.vue';
 import VacationStatus from '@/features/vacation-requests/components/VacationStatus.vue';
 import ApprovalFilters from '../components/ApprovalFilters.vue';
-import RejectionDialog from '../components/RejectionDialog.vue';
+import DecisionDialog from '../components/DecisionDialog.vue';
+import RequestDetailsDialog from '@/features/vacation-requests/components/RequestDetailsDialog.vue';
 import { approvalsService } from '../approvals.service';
 import type { VacationRequest, VacationStatus as StatusType } from '@/features/vacation-requests/vacation-requests.types';
 import { formatDisplayDate } from '@/utils/date.utils';
@@ -218,18 +232,21 @@ export default Vue.extend({
     AppTable,
     AppButton,
     AppPagination,
+    SignedInAs,
+    UserAvatar,
     VacationStatus,
     ApprovalFilters,
-    RejectionDialog,
+    DecisionDialog,
+    RequestDetailsDialog,
   },
   data() {
     return {
       feedbackMessage: '',
       feedbackType: 'success' as 'success' | 'error',
-      isRejectionDialogOpen: false,
-      targetRejectRequest: null as VacationRequest | null,
-      isApproving: false,
-      isRejecting: false,
+      decisionRequest: null as VacationRequest | null,
+      decisionMode: 'approve' as 'approve' | 'reject',
+      detailsRequest: null as VacationRequest | null,
+      isSubmitting: false,
       actionId: null as string | null,
     };
   },
@@ -279,41 +296,33 @@ export default Vue.extend({
       approvalsService.setFilter('pageSize', size);
       this.loadData();
     },
-    async handleApprove(req: VacationRequest) {
-      this.actionId = req.id;
-      this.isApproving = true;
-      try {
-        await approvalsService.approve(req.id);
-        this.showFeedback(`Vacation request for ${req.requesterName} was approved.`, 'success');
-      } catch (err: unknown) {
-        this.showFeedback(getErrorMessage(err), 'error');
-      } finally {
-        this.actionId = null;
-        this.isApproving = false;
-      }
+    openDecisionDialog(req: VacationRequest, mode: 'approve' | 'reject') {
+      this.decisionMode = mode;
+      this.decisionRequest = req;
     },
-    openRejectionDialog(req: VacationRequest) {
-      this.targetRejectRequest = req;
-      this.isRejectionDialogOpen = true;
+    closeDecisionDialog() {
+      this.decisionRequest = null;
     },
-    closeRejectionDialog() {
-      this.isRejectionDialogOpen = false;
-      this.targetRejectRequest = null;
-    },
-    async handleRejectConfirm(comment: string) {
-      if (!this.targetRejectRequest) return;
-      const req = this.targetRejectRequest;
-      this.isRejecting = true;
+    async handleDecisionConfirm(comment: string) {
+      if (!this.decisionRequest) return;
+      const req = this.decisionRequest;
+      const approving = this.decisionMode === 'approve';
+      this.isSubmitting = true;
       this.actionId = req.id;
 
       try {
-        await approvalsService.reject(req.id, comment);
-        this.showFeedback(`Vacation request for ${req.requesterName} was rejected with recorded comment.`, 'success');
-        this.closeRejectionDialog();
+        if (approving) {
+          await approvalsService.approve(req.id, comment || undefined);
+          this.showFeedback(`Review completed: ${req.requesterName}'s vacation request was approved.`, 'success');
+        } else {
+          await approvalsService.reject(req.id, comment);
+          this.showFeedback(`Vacation request for ${req.requesterName} was rejected with recorded comment.`, 'success');
+        }
+        this.closeDecisionDialog();
       } catch (err: unknown) {
         this.showFeedback(getErrorMessage(err), 'error');
       } finally {
-        this.isRejecting = false;
+        this.isSubmitting = false;
         this.actionId = null;
       }
     },

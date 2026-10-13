@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-white flex flex-col text-slate-900">
-    <AppHeader @user-switched="onUserSwitched" />
+    <AppHeader />
     <AppSidebar />
 
     <main class="flex-1 w-full">
@@ -8,7 +8,7 @@
     </main>
 
     <footer class="border-t border-neutral-200/80 bg-neutral-50/50 py-6 mt-12 text-xs text-slate-500">
-      <div class="max-w-6xl mx-auto px-6 md:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="max-w-7xl mx-auto px-6 md:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div class="flex items-center gap-2">
           <span>Vacation Management System</span>
           <span aria-hidden="true">·</span>
@@ -54,9 +54,6 @@ export default Vue.extend({
     },
   },
   methods: {
-    onUserSwitched() {
-      // Key on router-view triggers fresh load of data
-    },
     onResetData() {
       if (confirm('Reset vacation requests and demo accounts back to default seed data?')) {
         mockApi.resetToDefaults();

@@ -2,8 +2,6 @@ import Vue from 'vue';
 import type { User } from '@/types/user.types';
 import type { LoginCredentials } from './auth.types';
 import { authApiClient, hasAuthToken } from '@/services/api-client';
-import { mockApi } from '@/mocks/mock-api';
-import { SEEDED_USERS } from '@/mocks/mock-data';
 import { getErrorMessage } from '@/utils/error.utils';
 
 interface AuthState {
@@ -39,10 +37,6 @@ export const authService = {
 
   get isRequester(): boolean {
     return state.currentUser?.role === 'REQUESTER';
-  },
-
-  get seededDemoUsers(): User[] {
-    return SEEDED_USERS;
   },
 
   async init(): Promise<User | null> {
@@ -94,12 +88,5 @@ export const authService = {
       state.isAuthenticated = false;
       state.isLoading = false;
     }
-  },
-
-  switchDemoUser(userId: string): User {
-    const user = mockApi.switchDemoUser(userId);
-    state.currentUser = user;
-    state.isAuthenticated = true;
-    return user;
   },
 };

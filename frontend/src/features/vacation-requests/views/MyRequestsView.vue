@@ -1,9 +1,6 @@
 <template>
-  <div class="max-w-6xl mx-auto px-6 md:px-8 pt-8 sm:pt-12 pb-16">
-    <!-- Typographic Section Label -->
-    <div class="text-xs font-semibold tracking-wider text-slate-400 uppercase mb-2">
-      01 / MY REQUESTS
-    </div>
+  <div class="max-w-7xl mx-auto px-6 md:px-8 pt-8 sm:pt-12 pb-16">
+    <SignedInAs />
 
     <!-- Page Header & Action -->
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
@@ -128,6 +125,7 @@
 import Vue from 'vue';
 import AppButton from '@/components/common/AppButton.vue';
 import AppModal from '@/components/common/AppModal.vue';
+import SignedInAs from '@/components/layout/SignedInAs.vue';
 import VacationRequestList from '../components/VacationRequestList.vue';
 import VacationRequestForm from '../components/VacationRequestForm.vue';
 import { vacationRequestsService } from '../vacation-requests.service';
@@ -138,6 +136,7 @@ export default Vue.extend({
   components: {
     AppButton,
     AppModal,
+    SignedInAs,
     VacationRequestList,
     VacationRequestForm,
   },

@@ -121,11 +121,11 @@ export const vacationApiClient: IVacationApi = {
     return response.data;
   },
 
-  async approveRequest(id) {
+  async approveRequest(id, comment) {
     if (USE_MOCK_MODE) {
-      return mockApi.approveRequest(id);
+      return mockApi.approveRequest(id, comment);
     }
-    const response = await httpClient.patch(`/vacation-requests/${id}/approve`);
+    const response = await httpClient.patch(`/vacation-requests/${id}/approve`, { comment });
     return response.data;
   },
 

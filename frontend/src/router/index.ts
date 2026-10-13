@@ -32,7 +32,7 @@ const routes: RouteConfig[] = [
         path: 'my-requests',
         name: 'MyRequests',
         component: MyRequestsView,
-        meta: { requiresAuth: true },
+        meta: { requiresAuth: true, requiredRole: 'REQUESTER' },
       },
       {
         path: 'approvals',
