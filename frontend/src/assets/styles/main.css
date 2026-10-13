@@ -1,0 +1,55 @@
+@import "tailwindcss";
+@import "./tokens.css";
+
+@theme {
+  --color-bg: #FFFFFF;
+  --color-bg-alt: #FBFCFD;
+  --color-surface: #FFFFFF;
+  --color-border: #F1F3F6;
+  --color-border-hover: #E3E6EA;
+  --color-foreground: #0F172A;
+  --color-text-muted: #475569;
+  --color-text-subtle: #64748B;
+  --color-accent: #0F172A;
+  --color-accent-hover: #334155;
+  --color-accent-soft: #F8F9FB;
+  --color-accent-muted: #F1F3F6;
+  --color-success: #16A34A;
+  --color-neutral-50: #FBFCFD;
+  --color-neutral-100: #F6F7F9;
+  --color-neutral-200: #EFF1F4;
+  --color-neutral-300: #E3E6EA;
+  --color-neutral-400: #94A3B8;
+  --color-neutral-500: #64748B;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1E293B;
+  --color-neutral-900: #0F172A;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+html, body {
+  font-family: var(--font-sans, 'Plus Jakarta Sans', system-ui, sans-serif);
+  color: #0F172A;
+  background-color: #FFFFFF;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* Subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #E3E6EA;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
