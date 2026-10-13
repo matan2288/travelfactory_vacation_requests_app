@@ -14,6 +14,13 @@ export default defineConfig(() => {
     server: {
       port: 3000,
       host: '0.0.0.0',
+      // Backend routes have no /api prefix; same-origin proxy avoids CORS in local dev.
+      proxy: {
+        '/api': {
+          target: 'http://localhost:8888',
+          rewrite: (p) => p.replace(/^\/api/, ''),
+        },
+      },
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
       // Do not modify—file watching is disabled to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',

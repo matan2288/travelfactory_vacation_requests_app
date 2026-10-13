@@ -8,7 +8,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "codegen": "node node_modules/commoneventframework/dist/script/generateHandlerRegistry.js",
+    "codegen": "cef-gen-handlers",
     "dev": "npm run codegen && ts-node src/index.ts --local 8888",
     "build": "cef-build",
     "typecheck": "npm run codegen && tsc --noEmit",

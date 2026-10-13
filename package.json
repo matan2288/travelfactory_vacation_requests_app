@@ -4,13 +4,19 @@
   "version": "1.0.0",
   "type": "module",
   "workspaces": [
-    "frontend"
+    "frontend",
+    "backend"
   ],
   "scripts": {
-    "dev": "vite --port=3000 --host=0.0.0.0",
+    "dev:frontend": "vite --port=3000 --host=0.0.0.0",
+    "dev:backend": "npm run dev -w backend",
+    "db:up": "npm run db:up -w backend",
+    "db:migrate": "npm run db:migrate -w backend",
+    "db:seed": "npm run db:seed -w backend",
+    "test:backend": "npm test -w backend",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && npm run typecheck -w backend",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
