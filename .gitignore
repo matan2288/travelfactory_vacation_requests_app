@@ -1,0 +1,34 @@
+# Dependencies and build output
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+
+# Logs and coverage
+*.log
+npm-debug.log*
+coverage/
+
+# OS and editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
+
+# Backend generated output (when present)
+backend/dist/
+
+# Agent skills (not required for submission)
+.agents/
+skills-lock.json
+
+# Cursor runtime (track project_specific_assets/ and personas/ only)
+.cursor/hooks.json
+.cursor/hooks/
+.cursor/core/
